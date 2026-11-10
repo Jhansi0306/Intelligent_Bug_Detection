@@ -3,9 +3,17 @@ import streamlit as st
 import os
 import tempfile
 
+# Load Gemini API key from Streamlit Cloud Secrets
+try:
+    if "GEMINI_API_KEY" in st.secrets:
+        os.environ["GEMINI_API_KEY"] = st.secrets["GEMINI_API_KEY"]
+except Exception:
+    pass
+
 from modules.unified_analyzer import analyze_code
 from modules.llm_explainer import explain_bug
 from modules.code_optimizer import optimize_code
+
 
 
 st.set_page_config(
