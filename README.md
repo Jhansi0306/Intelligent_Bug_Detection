@@ -2,27 +2,28 @@
 
 ## Project Overview
 
-Intelligent Bug Detection and Code Optimization Using LLM is an AI-powered Python code analysis system designed to identify programming issues, explain detected bugs, and suggest optimized code using Large Language Models (LLMs).
+Intelligent Bug Detection and Code Optimization Using LLM is an AI-powered Python application that helps developers identify programming errors, understand code-quality issues, and improve their code using Large Language Models (LLMs).
 
-The system combines traditional static code analysis with Gemini AI to help developers understand code quality issues and improve their Python programs.
+The project combines traditional static code analysis techniques with Google Gemini AI to provide bug detection, beginner-friendly explanations, and code optimization suggestions through an interactive Streamlit interface.
 
 ## Key Features
 
-- **Python Code Upload:** Upload Python source files through a Streamlit web interface.
-- **Static Code Analysis:** Detect code issues using Python AST and Pylint.
+- **Python Code Upload:** Upload Python files through the application.
+- **Static Code Analysis:** Analyze source code using Python AST and Pylint.
 - **Bug Detection:** Identify syntax errors and code-quality issues.
-- **AI Bug Explanation:** Use Gemini AI to explain detected issues and suggest corrections.
-- **Code Optimization:** Generate AI-based suggestions for improving code readability and efficiency.
-- **Interactive Interface:** View analysis results through a Streamlit application.
+- **AI Bug Explanation:** Generate simple explanations and possible corrections using Gemini AI.
+- **Code Optimization:** Generate optimized code suggestions using AI.
+- **Interactive User Interface:** Perform analysis and optimization through a Streamlit web application.
 
 ## Technologies Used
 
 - Python
 - Streamlit
 - Google Gemini API
-- Pylint
+- Google GenAI SDK
 - Python AST
-- HTML/CSS (if used for future interface enhancements)
+- Pylint
+- Git and GitHub
 
 ## Project Structure
 
@@ -40,17 +41,16 @@ Intelligent_Bug_Detection/
 │   ├── unified_analyzer.py
 │   ├── llm_explainer.py
 │   ├── code_optimizer.py
-│   └── complete_analyzer.py
+│   ├── complete_analyzer.py
+│   └── check_gemini.py
 │
 ├── code/
 │   ├── sample.py
 │   └── student_grade.py
 │
-├── data/
-├── database/
-├── tests/
-├── static/
-└── uploads/
+└── tests/
+    ├── gemini_test.py
+    └── test.py
 ```
 
 ## Installation and Setup
@@ -58,7 +58,7 @@ Intelligent_Bug_Detection/
 ### 1. Clone the Repository
 
 ```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
+git clone https://github.com/Jhansi0306/Intelligent_Bug_Detection.git
 cd Intelligent_Bug_Detection
 ```
 
@@ -68,9 +68,9 @@ cd Intelligent_Bug_Detection
 python -m venv venv
 ```
 
-### 3. Activate the Environment
+### 3. Activate the Virtual Environment
 
-Windows:
+For Windows:
 
 ```bash
 venv\Scripts\activate
@@ -84,7 +84,9 @@ pip install -r requirements.txt
 
 ### 5. Configure Gemini API Key
 
-Create a `.env` file in the project root:
+Configure your Gemini API key using an environment variable or Streamlit secrets.
+
+For local development, create a `.env` file in the project root if your application is configured to load it:
 
 ```env
 GEMINI_API_KEY=your_api_key_here
@@ -100,24 +102,28 @@ streamlit run app.py
 
 ## Application Workflow
 
-1. Upload a Python source-code file.
-2. Display the uploaded code.
-3. Run static code analysis.
-4. Identify and display detected issues.
-5. Send detected issues to Gemini AI for explanation.
-6. Generate code optimization suggestions.
-7. Display the analysis and optimization results.
+1. Open the Streamlit application.
+2. Upload a Python file or enter Python code.
+3. Select Static Analysis to identify code issues.
+4. View the detected issues.
+5. Use AI Bug Explanation to understand the identified problems.
+6. Select Code Optimization to generate improved code suggestions.
 
 ## Future Enhancements
 
 - Support for additional programming languages.
-- Advanced bug classification using machine learning.
+- Advanced bug classification.
 - Code complexity and performance analysis.
-- Historical analysis reports using a database.
-- Downloadable bug reports.
-- Improved code optimization and correction suggestions.
+- Historical analysis reports.
+- Downloadable analysis reports.
+- Improved automated code correction.
 
-## Project Title
+## Project Information
 
-**Intelligent Bug Detection and Code Optimization Using LLM**
+**Project Title:** Intelligent Bug Detection and Code Optimization Using LLM
 
+**Repository:** https://github.com/Jhansi0306/Intelligent_Bug_Detection
+
+**Application Framework:** Streamlit
+
+**AI Model:** Google Gemini
