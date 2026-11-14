@@ -3,16 +3,26 @@ import ast
 import subprocess
 import sys
 import json
+import os
+import tempfile
 
 
 def analyze_code(file_path):
 
     try:
-        # Step 1: Read source code
-        with open(file_path, "r", encoding="utf-8-sig", newline=None) as file:
+        # Step 1: Read source code and normalize line endings
+        with open(
+            file_path,
+            "r",
+            encoding="utf-8-sig",
+            newline=None
+        ) as file:
             source_code = file.read()
 
-        # Step 2: Check syntax
+        source_code = source_code.replace("\r\n", "\n")
+        source_code = source_code.replace("\r", "\n")
+
+        # Step 2: Check Python syntax
         try:
             ast.parse(source_code)
 
@@ -34,53 +44,79 @@ def analyze_code(file_path):
                 ]
             }
 
-        # Step 3: Run Pylint
-        result = subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "pylint",
-                "--output-format=json",
-                "--enable=unused-variable",
-                file_path
-            ],
-            capture_output=True,
-            text=True,
-            timeout=30
-        )
+        # Step 3: Create a temporary file with clean LF line endings
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            suffix=".py",
+            encoding="utf-8",
+            newline="\n",
+            delete=False
+        ) as temp_file:
 
-        # Step 4: Read Pylint results
-        pylint_issues = json.loads(result.stdout or "[]")
+            temp_file.write(source_code)
+            clean_file_path = temp_file.name
 
-        bug_reports = []
+        try:
+            # Step 4: Run Pylint on normalized source code
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "pylint",
+                    "--output-format=json",
+                    "--enable=unused-variable",
+                    clean_file_path
+                ],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=30
+            )
 
-        for issue in pylint_issues:
+            # Step 5: Read Pylint results
+            try:
+                pylint_issues = json.loads(result.stdout or "[]")
+            except json.JSONDecodeError:
+                return {
+                    "status": "error",
+                    "message": "Unable to read Pylint analysis results."
+                }
 
-            issue_type = issue["type"]
+            bug_reports = []
 
-            if issue_type in ["error", "fatal"]:
-                severity = "error"
-            elif issue_type == "warning":
-                severity = "warning"
-            else:
-                severity = "info"
+            for issue in pylint_issues:
 
-            bug_reports.append({
-                "type": issue_type,
-                "message": issue["message"],
-                "file": issue["path"],
-                "line": issue["line"],
-                "column": issue["column"],
-                "severity": severity,
-                "code": issue["message-id"]
-            })
+                issue_type = issue.get("type", "info")
 
-        return {
-            "status": "success",
-            "file": file_path,
-            "total_issues": len(bug_reports),
-            "issues": bug_reports
-        }
+                if issue_type in ["error", "fatal"]:
+                    severity = "error"
+                elif issue_type == "warning":
+                    severity = "warning"
+                else:
+                    severity = "info"
+
+                bug_reports.append({
+                    "type": issue_type,
+                    "message": issue.get("message", ""),
+                    "file": file_path,
+                    "line": issue.get("line", 0),
+                    "column": issue.get("column", 0),
+                    "severity": severity,
+                    "code": issue.get("message-id", "")
+                })
+
+            return {
+                "status": "success",
+                "file": file_path,
+                "total_issues": len(bug_reports),
+                "issues": bug_reports
+            }
+
+        finally:
+            # Step 6: Remove temporary file
+            if os.path.exists(clean_file_path):
+                os.remove(clean_file_path)
 
     except Exception as error:
 
